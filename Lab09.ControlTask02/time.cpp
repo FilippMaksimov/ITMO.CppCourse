@@ -48,7 +48,7 @@ void Time::ShowTime() const
 		<< Time::toTimeFormat(Time::seconds);
 }
 
-Time Time::addTime(const Time secondValue) const
+Time Time::addTime(const Time &secondValue) const
 {
 	int h, m, s;
 	h = Time::hours + secondValue.hours;
