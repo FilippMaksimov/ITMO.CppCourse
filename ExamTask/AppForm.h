@@ -498,7 +498,7 @@ namespace ExamTask {
 			//Read from file
 			String^ fileName;
 			if (textBox1->Text != "")
-				textBox1->Text = "";
+				textBox1->Text = ""; 
 			if (TextRadioButton->Checked == true)
 				fileName = "Address.txt";
 			else if (JsonRadioButton->Checked == true)
