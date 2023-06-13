@@ -1,0 +1,9 @@
+-
+Full name: Ivan Ivanov
+Date of birth: 23.01.1968
+Address: Moscow, Sadovaya str, 76, 5
+Position: Teacher
+Working time: Teacher
+Academic degree: 40
+Subject: PhD
+-

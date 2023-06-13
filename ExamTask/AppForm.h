@@ -5,6 +5,8 @@
 #include "BrigdeAbstraction.h"
 #include "human.h"
 #include <string>
+#include "RefinedAbstraction.h"
+#include <io.h>
 
 namespace ExamTask {
 
@@ -14,6 +16,7 @@ namespace ExamTask {
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
+	using namespace System::Text::RegularExpressions;
 
 	/// <summary>
 	/// Summary for AppForm
@@ -28,6 +31,7 @@ namespace ExamTask {
 			//TODO: Add the constructor code here
 			//
 		}
+		void MarshalString(String^, std::string&);
 
 	protected:
 		/// <summary>
@@ -81,6 +85,8 @@ namespace ExamTask {
 
 
 	private: char menuStatus = NULL;
+	private: System::Windows::Forms::ErrorProvider^ errorProvider1;
+	private: System::ComponentModel::IContainer^ components;
 
 
 
@@ -90,7 +96,7 @@ namespace ExamTask {
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
-		System::ComponentModel::Container ^components;
+
 
 #pragma region Windows Form Designer generated code
 		/// <summary>
@@ -99,6 +105,8 @@ namespace ExamTask {
 		/// </summary>
 		void InitializeComponent(void)
 		{
+			this->components = (gcnew System::ComponentModel::Container());
+			System::ComponentModel::ComponentResourceManager^ resources = (gcnew System::ComponentModel::ComponentResourceManager(AppForm::typeid));
 			this->menuStrip1 = (gcnew System::Windows::Forms::MenuStrip());
 			this->menuToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->typeToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
@@ -128,12 +136,15 @@ namespace ExamTask {
 			this->workingTimeLabel = (gcnew System::Windows::Forms::Label());
 			this->subjectLabel = (gcnew System::Windows::Forms::Label());
 			this->academicDegreeLabel = (gcnew System::Windows::Forms::Label());
+			this->errorProvider1 = (gcnew System::Windows::Forms::ErrorProvider(this->components));
 			this->menuStrip1->SuspendLayout();
 			this->groupBox1->SuspendLayout();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->errorProvider1))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// menuStrip1
 			// 
+			this->menuStrip1->BackColor = System::Drawing::Color::LightGray;
 			this->menuStrip1->ImageScalingSize = System::Drawing::Size(20, 20);
 			this->menuStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->menuToolStripMenuItem });
 			this->menuStrip1->Location = System::Drawing::Point(0, 0);
@@ -213,12 +224,16 @@ namespace ExamTask {
 			// 
 			// textBox1
 			// 
-			this->textBox1->Location = System::Drawing::Point(437, 46);
+			this->textBox1->BackColor = System::Drawing::SystemColors::ControlLight;
+			this->textBox1->Cursor = System::Windows::Forms::Cursors::Hand;
+			this->textBox1->ImeMode = System::Windows::Forms::ImeMode::Off;
+			this->textBox1->Location = System::Drawing::Point(437, 31);
 			this->textBox1->Multiline = true;
 			this->textBox1->Name = L"textBox1";
 			this->textBox1->ReadOnly = true;
+			this->textBox1->RightToLeft = System::Windows::Forms::RightToLeft::No;
 			this->textBox1->ScrollBars = System::Windows::Forms::ScrollBars::Both;
-			this->textBox1->Size = System::Drawing::Size(255, 434);
+			this->textBox1->Size = System::Drawing::Size(267, 484);
 			this->textBox1->TabIndex = 6;
 			// 
 			// groupBox1
@@ -274,6 +289,7 @@ namespace ExamTask {
 			this->AddressTextBox->Name = L"AddressTextBox";
 			this->AddressTextBox->Size = System::Drawing::Size(315, 22);
 			this->AddressTextBox->TabIndex = 10;
+			this->AddressTextBox->Validating += gcnew System::ComponentModel::CancelEventHandler(this, &AppForm::AddressTextBox_Validating);
 			// 
 			// nameLabel
 			// 
@@ -372,9 +388,15 @@ namespace ExamTask {
 			this->academicDegreeLabel->Size = System::Drawing::Size(100, 23);
 			this->academicDegreeLabel->TabIndex = 0;
 			// 
+			// errorProvider1
+			// 
+			this->errorProvider1->ContainerControl = this;
+			// 
 			// AppForm
 			// 
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Inherit;
+			this->BackColor = System::Drawing::SystemColors::Control;
+			this->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"$this.BackgroundImage")));
 			this->ClientSize = System::Drawing::Size(704, 516);
 			this->Controls->Add(this->addressLabel);
 			this->Controls->Add(this->dateLabel);
@@ -393,11 +415,13 @@ namespace ExamTask {
 			this->MaximizeBox = false;
 			this->MinimizeBox = false;
 			this->Name = L"AppForm";
+			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
 			this->Text = L"Address book";
 			this->menuStrip1->ResumeLayout(false);
 			this->menuStrip1->PerformLayout();
 			this->groupBox1->ResumeLayout(false);
 			this->groupBox1->PerformLayout();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->errorProvider1))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
@@ -405,34 +429,97 @@ namespace ExamTask {
 #pragma endregion
 		private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
 			//Save to File
-			//Example of using Bridge GoF
-			if (studentToolStripMenuItem->Checked)
+			if (ValidateChildren(ValidationConstraints::Enabled))
 			{
+				Human* human;
+				std::string name;
+				std::string birth_date;
+				std::string address;
+				MarshalString(NameTextBox->Text, name);
+				MarshalString(BirthDateTextBox->Text, birth_date);
+				MarshalString(AddressTextBox->Text, address);
+				if (menuStatus == 's')
+				{
+					std::string grade;
+					MarshalString(gradeTextBox->Text, grade);
+					human = new Student(grade);
+					human->setName(name);
+					human->setDateOfBirth(birth_date);
+					human->setAddress(address);
+				}
+				else if (menuStatus == 't')
+				{
+					std::string w_time;
+					std::string a_degree;
+					std::string subj;
+					MarshalString(workingTimeTextBox->Text, w_time);
+					MarshalString(AcademicDegreeTextBox->Text, a_degree);
+					MarshalString(subjectTextBox->Text, subj);
+					human = new Teacher(w_time, a_degree, subj);
+					human->setName(name);
+					human->setDateOfBirth(birth_date);
+					human->setAddress(address);
+				}
+				else if (menuStatus == 'd')
+				{
+					std::string fuculty;
+					MarshalString(fucultyTextBox->Text, fuculty);
+					human = new Dean(fuculty);
+					human->setName(name);
+					human->setDateOfBirth(birth_date);
+					human->setAddress(address);
+				}
+				else
+					MessageBox::Show("Category is not selected");
 
-			}
-			else if (teacherToolStripMenuItem->Checked)
-			{
-
-			}
-			else if (deanToolStripMenuItem->Checked)
-			{
-
+				BridgeAbstarction* abstraction;
+				if (TextRadioButton->Checked == true)
+				{
+					abstraction = new BridgeAbstarction(human);
+					abstraction->saveToFile();
+					MessageBox::Show("Saved to Text file");
+				}
+				else if (JsonRadioButton->Checked == true)
+				{
+					abstraction = new RefinedAbstraction(human);
+					abstraction->saveToFile();
+					MessageBox::Show("Saved to JSON file");
+				}
+				else
+					MessageBox::Show("File type is not selected to be saved");
+				delete human;
+				delete abstraction;
 			}
 			else
-			{
-
-			}
-			std::string m = "m";
-			Human* human = new Student(m);
-			BridgeAbstarction* abstraction = new BridgeAbstarction(human);
-			abstraction->saveToFile();
-			delete human;
-			delete abstraction;
+				MessageBox::Show("Not valid Addrees. Example: Saint Petersburg, Fontanka street, biulding 8, 52");
 		}
 
 		private: System::Void button2_Click(System::Object^ sender, System::EventArgs^ e) {
 			//Read from file
-
+			String^ fileName;
+			if (TextRadioButton->Checked == true)
+				fileName = "Address.txt";
+			else if (JsonRadioButton->Checked == true)
+				fileName = "Address.json";
+			else
+				MessageBox::Show("File format is not selected!");
+			try
+			{
+				System::IO::StreamReader^ in = System::IO::File::OpenText(fileName);
+				String^ data;
+				String^ empty = "\n";
+				int count = 0;
+				while ((data = in->ReadLine()) != nullptr)
+				{
+					count++;
+					textBox1->Text += data + empty;
+				}
+			}
+			catch (Exception^ e)
+			{
+				if (dynamic_cast<System::IO::FileNotFoundException^>(e))
+					MessageBox::Show("File " + fileName + " not found");
+			}
 		}
 
 		private: System::Void teacherToolStripMenuItem_Click(System::Object^ sender, System::EventArgs^ e) {
@@ -554,6 +641,27 @@ namespace ExamTask {
 			this->Controls->Add(this->fucultyLabel);
 
 			menuStatus = 'd';
+		}
+		private: System::Void AddressTextBox_Validating(System::Object^ sender, System::ComponentModel::CancelEventArgs^ e) {
+			int count = 0;
+			String^ d = AddressTextBox->Text->ToString();
+			for (int i = 0; i < d->Length; i++)
+			{
+				if (d[i] == ',')
+					count++;
+			}
+			if (count!=3)
+			{
+				e->Cancel = true;
+				AddressTextBox->Focus();
+				errorProvider1->SetError(AddressTextBox, "Invalid format. Please enter with the following template:" +
+					"(City), (Street), #(Building No), (#Flat)");
+			}
+			else
+			{
+				e->Cancel = false;
+				errorProvider1->Clear();
+			}
 		}
 };
 }

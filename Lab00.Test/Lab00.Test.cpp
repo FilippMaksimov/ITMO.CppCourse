@@ -6,6 +6,8 @@
 #include <array>
 #include <math.h>
 #include <string>
+#include <list>
+#include <iterator>
 
 // Task #1
 class A
@@ -101,6 +103,18 @@ int main()
     pt3 = pt1 + 5;
     std::cout << "Distance pt1 = " << pt1.get_dist() << std::endl;
     std::cout << "Distacne pt3 = pt1 + 5 = " << pt3.get_dist() << std::endl;
+
+    std::list<std::string> names = { "Filipp", "Anton", "Vladimir", "Anastasia" };
+    std::cout << *std::next(names.begin(), 0) << " " << *std::next(names.begin(), 3) << std::endl;
+
+    std::string name = "Ivan Ivanov";
+    for (int i = 0; i < name.length(); i++)
+    {
+        std::cout << name[i];
+        if (name[i] == ' ')
+            break;
+    }
+
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
