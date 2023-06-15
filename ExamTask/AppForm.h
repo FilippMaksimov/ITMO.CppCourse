@@ -86,6 +86,7 @@ namespace ExamTask {
 
 	private: char menuStatus = NULL;
 	private: System::Windows::Forms::ErrorProvider^ errorProvider1;
+	private: System::Windows::Forms::ErrorProvider^ errorProvider2;
 	private: System::ComponentModel::IContainer^ components;
 
 
@@ -137,9 +138,11 @@ namespace ExamTask {
 			this->subjectLabel = (gcnew System::Windows::Forms::Label());
 			this->academicDegreeLabel = (gcnew System::Windows::Forms::Label());
 			this->errorProvider1 = (gcnew System::Windows::Forms::ErrorProvider(this->components));
+			this->errorProvider2 = (gcnew System::Windows::Forms::ErrorProvider(this->components));
 			this->menuStrip1->SuspendLayout();
 			this->groupBox1->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->errorProvider1))->BeginInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->errorProvider2))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// menuStrip1
@@ -149,7 +152,7 @@ namespace ExamTask {
 			this->menuStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->menuToolStripMenuItem });
 			this->menuStrip1->Location = System::Drawing::Point(0, 0);
 			this->menuStrip1->Name = L"menuStrip1";
-			this->menuStrip1->Size = System::Drawing::Size(704, 30);
+			this->menuStrip1->Size = System::Drawing::Size(704, 28);
 			this->menuStrip1->TabIndex = 2;
 			this->menuStrip1->Text = L"menuStrip1";
 			// 
@@ -157,7 +160,7 @@ namespace ExamTask {
 			// 
 			this->menuToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->typeToolStripMenuItem });
 			this->menuToolStripMenuItem->Name = L"menuToolStripMenuItem";
-			this->menuToolStripMenuItem->Size = System::Drawing::Size(60, 26);
+			this->menuToolStripMenuItem->Size = System::Drawing::Size(60, 24);
 			this->menuToolStripMenuItem->Text = L"Menu";
 			// 
 			// typeToolStripMenuItem
@@ -275,6 +278,7 @@ namespace ExamTask {
 			this->NameTextBox->Name = L"NameTextBox";
 			this->NameTextBox->Size = System::Drawing::Size(315, 22);
 			this->NameTextBox->TabIndex = 8;
+			this->NameTextBox->Validating += gcnew System::ComponentModel::CancelEventHandler(this, &AppForm::NameTextBox_Validating);
 			// 
 			// BirthDateTextBox
 			// 
@@ -392,6 +396,10 @@ namespace ExamTask {
 			// 
 			this->errorProvider1->ContainerControl = this;
 			// 
+			// errorProvider2
+			// 
+			this->errorProvider2->ContainerControl = this;
+			// 
 			// AppForm
 			// 
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Inherit;
@@ -422,6 +430,7 @@ namespace ExamTask {
 			this->groupBox1->ResumeLayout(false);
 			this->groupBox1->PerformLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->errorProvider1))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->errorProvider2))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
@@ -665,5 +674,19 @@ namespace ExamTask {
 				errorProvider1->Clear();
 			}
 		}
+			private: System::Void NameTextBox_Validating(System::Object^ sender, System::ComponentModel::CancelEventArgs^ e) {
+				Regex^ regex = gcnew Regex("[A-Za-z]+\\s[A-Za-z]+");
+				if (!regex->IsMatch(NameTextBox->Text))
+				{
+					e->Cancel = true;
+					NameTextBox->Focus();
+					errorProvider2->SetError(NameTextBox, "Invalid format. There are only Name and Lastname using whitespace");
+				}
+				else
+				{
+					e->Cancel = false;
+					errorProvider2->Clear();
+				}
+			}
 };
 }
